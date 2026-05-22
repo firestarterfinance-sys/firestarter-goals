@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Money on Purpose · Goals Firestarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1a7a58;
+    --green-light: #e8f5ef;
+    --green-mid: #2ea87a;
+    --green-dark: #0f4f38;
+    --sand: #f5f0e8;
+    --sand-dark: #e8e0d0;
+    --ink: #1a1814;
+    --ink-mid: #4a4540;
+    --ink-light: #8a8480;
+    --white: #fdfcfa;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* NAV */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 0;
+    margin-bottom: 48px;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--green);
+    letter-spacing: 0.01em;
+  }
+  .logo span { font-style: italic; }
+  .step-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* PROGRESS */
+  .progress {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 48px;
+  }
+  .prog-seg {
+    height: 2px;
+    flex: 1;
+    border-radius: 2px;
+    background: var(--sand-dark);
+    transition: background 0.4s;
+  }
+  .prog-seg.done { background: var(--green); }
+  .prog-seg.active { background: var(--green-mid); }
+
+  /* SCREENS */
+  .screen { display: none; animation: fadeUp 0.35s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* WELCOME SCREEN */
+  .welcome-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 16px;
+  }
+  .welcome-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .welcome-heading em { font-style: italic; color: var(--green); }
+  .welcome-sub {
+    font-size: 16px;
+    color: var(--ink-mid);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 480px;
+  }
+  .welcome-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .welcome-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--sand-dark);
+  }
+  .welcome-step .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--green);
+    flex-shrink: 0;
+    width: 24px;
+    line-height: 1;
+    margin-top: 1px;
+  }
+  .welcome-step .text { font-size: 14px; color: var(--ink-mid); line-height: 1.5; }
+  .welcome-step .text strong { color: var(--ink); font-weight: 500; }
+
+  /* SECTION HEADINGS */
+  .screen-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .screen-sub {
+    font-size: 14px;
+    color: var(--ink-light);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    text-decoration: none;
+  }
+  .btn-green {
+    background: var(--green);
+    color: #fff;
+  }
+  .btn-green:hover { background: var(--green-dark); }
+  .btn-green:disabled { background: var(--sand-dark); color: var(--ink-light); cursor: not-allowed; }
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--sand-dark);
+  }
+  .btn-outline:hover { border-color: var(--ink-light); }
+  .btn-copy {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border: 1.5px solid #b8dece;
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  .btn-copy:hover { background: #d2eddf; }
+  .btn-download {
+    background: var(--white);
+    color: var(--ink-mid);
+    border: 1.5px solid var(--sand-dark);
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  .btn-download:hover { border-color: var(--ink-light); }
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* GOAL INPUT */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .input-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-row input:focus { border-color: var(--green); }
+  .input-row input::placeholder { color: var(--ink-light); }
+  .add-btn {
+    padding: 12px 18px;
+    background: var(--white);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--ink-mid);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { border-color: var(--green); color: var(--green); }
+
+  /* QUICK CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .chip {
+    padding: 6px 14px;
+    font-size: 13px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--ink-mid);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .chip.used { opacity: 0.3; pointer-events: none; }
+
+  /* GOAL CARDS */
+  .goal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .goal-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    background: var(--white);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s;
+  }
+  .goal-card:hover { border-color: #c8c0b0; }
+  .goal-card.dragging { opacity: 0.4; border-style: dashed; }
+  .goal-card.drag-over { border-color: var(--green); background: var(--green-light); }
+  .drag-handle {
+    color: var(--ink-light);
+    cursor: grab;
+    font-size: 18px;
+    line-height: 1;
+    user-select: none;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .rank-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+  }
+  .goal-text { flex: 1; font-size: 15px; color: var(--ink); }
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-light);
+    font-size: 18px;
+    padding: 2px 4px;
+    line-height: 1;
+    transition: color 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .icon-btn:hover { color: var(--ink); }
+  .icon-btn.danger:hover { color: #c0392b; }
+  .icon-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* TIMELINE & MONEY CARDS */
+  .config-card {
+    background: var(--white);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .config-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .config-label .rank-dot { flex-shrink: 0; }
+  .config-label .name { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .pill-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .pill {
+    padding: 6px 16px;
+    font-size: 13px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--ink-mid);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .pill:hover { border-color: var(--green); color: var(--green); }
+  .pill.on { background: var(--green); color: #fff; border-color: var(--green); }
+  .cost-field {
+    width: 100%;
+    padding: 9px 14px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    background: var(--sand);
+    outline: none;
+    margin-top: 6px;
+    transition: border-color 0.2s;
+  }
+  .cost-field:focus { border-color: var(--green); background: var(--white); }
+  .cost-field::placeholder { color: var(--ink-light); }
+
+  /* CONTEXT TEXTAREA */
+  .context-area {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+  .context-area:focus { border-color: var(--green); }
+  .context-area::placeholder { color: var(--ink-light); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1.5px solid var(--sand-dark); margin: 28px 0; }
+
+  /* PROMPT BOX */
+  .prompt-box {
+    background: var(--ink);
+    color: #e8e4dc;
+    border-radius: var(--radius);
+    padding: 24px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    margin-bottom: 16px;
+    max-height: 380px;
+    overflow-y: auto;
+    letter-spacing: 0.01em;
+  }
+  .prompt-box::-webkit-scrollbar { width: 4px; }
+  .prompt-box::-webkit-scrollbar-thumb { background: #3a3530; border-radius: 2px; }
+
+  /* SUCCESS STATE */
+  .copy-success {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    background: var(--green-light);
+    border: 1.5px solid #b8dece;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--green-dark);
+    margin-bottom: 16px;
+    display: none;
+    line-height: 1.5;
+  }
+
+  /* HINT */
+  .hint { font-size: 13px; color: var(--ink-light); margin-top: 8px; line-height: 1.5; }
+
+  /* FOOTER TIP */
+  .tip-card {
+    background: var(--white);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-top: 28px;
+  }
+  .tip-card .tip-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+  .tip-card p { font-size: 14px; color: var(--ink-mid); line-height: 1.6; }
+
+  /* AUTO-SAVE INDICATOR */
+  .autosave {
+    font-size: 12px;
+    color: var(--ink-light);
+    text-align: right;
+    margin-top: 6px;
+    min-height: 18px;
+    transition: opacity 0.3s;
+  }
+
+  /* SINGLE GOAL NOTE */
+  .single-note {
+    background: var(--green-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--green-dark);
+    margin-bottom: 18px;
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .welcome-heading { font-size: 32px; }
+    .btn-row { flex-direction: column; align-items: stretch; }
+    .btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="logo">Money on Purpose <span>· Goals</span></div>
+    <div class="step-label" id="step-label"></div>
+  </div>
+
+  <div class="progress" id="progress">
+    <div class="prog-seg" data-s="1"></div>
+    <div class="prog-seg" data-s="2"></div>
+    <div class="prog-seg" data-s="3"></div>
+    <div class="prog-seg" data-s="4"></div>
+    <div class="prog-seg" data-s="5"></div>
+  </div>
+
+  <!-- SCREEN 0: WELCOME -->
+  <div class="screen active" id="s0">
+    <p class="welcome-eyebrow">Firestarter worksheet</p>
+    <h1 class="welcome-heading">Your goals.<br><em>Your roadmap.</em></h1>
+    <p class="welcome-sub">Answer a few simple questions and walk away with a personalized AI prompt that builds your 1, 5, and 10 year plan — tailored to your actual life.</p>
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="num">1</div>
+        <div class="text"><strong>Dump your goals.</strong> Big, small, scary — no filter. Add as many as you want or just one.</div>
+      </div>
+      <div class="welcome-step">
+        <div class="num">2</div>
+        <div class="text"><strong>Rank and time them.</strong> What matters most? When do you want it? Your gut knows.</div>
+      </div>
+      <div class="welcome-step">
+        <div class="num">3</div>
+        <div class="text"><strong>Get your prompt.</strong> Copy it. Paste it into any AI. Get a real, specific roadmap built around your life.</div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top: 0;">
+      <button class="btn btn-green" onclick="goScreen(1)">Let's go →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: DREAM DUMP -->
+  <div class="screen" id="s1">
+    <h2 class="screen-heading">What do you want?</h2>
+    <p class="screen-sub">No editing. No judging. Just dump every goal that matters to you right now — big, small, financial, personal, all of it.</p>
+
+    <div class="input-row">
+      <input type="text" id="goal-input" placeholder="Type a goal and press enter..." autocomplete="off" />
+      <button class="add-btn" onclick="addGoal()">+ Add</button>
+    </div>
+
+    <div class="chips" id="quick-chips">
+      <span class="chip" onclick="addQuick(this)">Own a home</span>
+      <span class="chip" onclick="addQuick(this)">Start a business</span>
+      <span class="chip" onclick="addQuick(this)">Travel more</span>
+      <span class="chip" onclick="addQuick(this)">Pay off debt</span>
+      <span class="chip" onclick="addQuick(this)">Retire early</span>
+      <span class="chip" onclick="addQuick(this)">Be present with family</span>
+      <span class="chip" onclick="addQuick(this)">Build an online audience</span>
+      <span class="chip" onclick="addQuick(this)">Save $100k</span>
+      <span class="chip" onclick="addQuick(this)">Work for myself</span>
+      <span class="chip" onclick="addQuick(this)">Get healthy</span>
+      <span class="chip" onclick="addQuick(this)">Homeschool my kids</span>
+      <span class="chip" onclick="addQuick(this)">Buy land or property</span>
+      <span class="chip" onclick="addQuick(this)">Invest consistently</span>
+      <span class="chip" onclick="addQuick(this)">Move to a new city</span>
+    </div>
+
+    <div class="goal-list" id="goal-list-1"></div>
+    <div class="autosave" id="autosave-1"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goScreen(0)">← Back</button>
+      <button class="btn btn-green" id="next-1" onclick="goScreen(2)" disabled>Rank my goals →</button>
+      <span class="hint" id="hint-1">Add at least one goal.</span>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: RANK -->
+  <div class="screen" id="s2">
+    <h2 class="screen-heading">What matters most?</h2>
+    <p class="screen-sub" id="rank-sub">Drag to reorder, or use the arrows. Whatever's at the top is your #1 priority — this shapes your whole roadmap.</p>
+    <div class="single-note" id="single-note">You've got one goal — we'll go deep on it. No ranking needed.</div>
+    <div class="goal-list" id="goal-list-2"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goScreen(1)">← Back</button>
+      <button class="btn btn-green" onclick="goScreen(3)">Set timelines →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: TIMELINES -->
+  <div class="screen" id="s3">
+    <h2 class="screen-heading">When do you want this?</h2>
+    <p class="screen-sub">Pick a timeline for each goal. Don't overthink it — go with your gut. You can always update your prompt later.</p>
+    <div id="timeline-list"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goScreen(2)">← Back</button>
+      <button class="btn btn-green" onclick="goScreen(4)">Money check →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: MONEY + CONTEXT -->
+  <div class="screen" id="s4">
+    <h2 class="screen-heading">Does money play a role?</h2>
+    <p class="screen-sub">For each goal, does it require money to happen? Rough estimates are totally fine — or skip it if you have no idea.</p>
+    <div id="money-list"></div>
+
+    <hr class="divider" />
+
+    <h3 style="font-family:'DM Serif Display',serif; font-size:20px; margin-bottom:6px;">Tell us a bit about you</h3>
+    <p style="font-size:14px; color:var(--ink-light); margin-bottom:12px; line-height:1.6;">The more context you give, the more specific your roadmap will be. Income, savings, family situation, where you're starting from — anything relevant.</p>
+    <textarea class="context-area" id="context-extra" placeholder="e.g. I'm a stay-at-home mom with 2 kids, I have $40k saved, my husband earns $90k/year, I'm starting a side business..."></textarea>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goScreen(3)">← Back</button>
+      <button class="btn btn-green" onclick="buildAndShow()">Build my prompt ✦</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: PROMPT -->
+  <div class="screen" id="s5">
+    <p class="welcome-eyebrow">Your personalized AI prompt</p>
+    <h2 class="screen-heading">Ready to paste.</h2>
+    <p class="screen-sub">Copy this and paste it into any AI — Claude, ChatGPT, Gemini, whatever you use. You'll get a real, specific 1/5/10 year roadmap built around your actual goals.</p>
+
+    <div class="prompt-box" id="prompt-output"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-copy" onclick="copyPrompt()">⎘ Copy prompt</button>
+      <span class="copy-success" id="copy-success">✓ Copied!</span>
+      <button class="btn btn-download" onclick="downloadPrompt()">↓ Save as .txt</button>
+      <button class="btn btn-outline" onclick="goScreen(4)">← Edit</button>
+    </div>
+
+    <div class="tip-card">
+      <div class="tip-label">Pro tip</div>
+      <p>After you get your roadmap, go deeper: <em>"Break down step 1 of my [goal] into a 90-day action plan"</em> — or ask it to focus on the money side only. The prompt is just the beginning.</p>
+    </div>
+
+    <div style="margin-top: 24px; text-align: center;">
+      <button class="btn btn-outline" onclick="startOver()" style="font-size:13px; padding:9px 18px;">Start over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let goals = [];
+  let timelines = {};
+  let money = {};
+  let currentScreen = 0;
+
+  const STORAGE_KEY = 'mop_goals_v1';
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ goals, timelines, money }));
+      showAutosave();
+    } catch(e) {}
+  }
+
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (d && d.goals && d.goals.length) {
+        goals = d.goals;
+        timelines = d.timelines || {};
+        money = d.money || {};
+        markUsedChips();
+        renderGoalList1();
+        checkNext1();
+      }
+    } catch(e) {}
+  }
+
+  function showAutosave() {
+    const el = document.getElementById('autosave-1');
+    if (!el) return;
+    el.textContent = 'Progress saved ✓';
+    setTimeout(() => { el.textContent = ''; }, 2000);
+  }
+
+  function markUsedChips() {
+    document.querySelectorAll('.chip').forEach(c => {
+      if (goals.includes(c.textContent.trim())) c.classList.add('used');
+    });
+  }
+
+  function goScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s' + n).classList.add('active');
+    currentScreen = n;
+    updateProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (n === 2) renderRank();
+    if (n === 3) renderTimelines();
+    if (n === 4) renderMoney();
+  }
+
+  function updateProgress(n) {
+    const labels = ['', 'Step 1 of 4', 'Step 2 of 4', 'Step 3 of 4', 'Step 4 of 4', 'Done!'];
+    document.getElementById('step-label').textContent = labels[n] || '';
+    document.querySelectorAll('.prog-seg').forEach((s, i) => {
+      s.className = 'prog-seg';
+      if (n === 0) return;
+      const step = i + 1;
+      if (step < n) s.classList.add('done');
+      else if (step === n) s.classList.add('active');
+    });
+  }
+
+  function addGoal(text) {
+    const input = document.getElementById('goal-input');
+    const val = (text || input.value).trim();
+    if (!val) return;
+    if (goals.find(g => g.toLowerCase() === val.toLowerCase())) { input.value = ''; return; }
+    goals.push(val);
+    input.value = '';
+    renderGoalList1();
+    checkNext1();
+    save();
+  }
+
+  function addQuick(el) {
+    if (el.classList.contains('used')) return;
+    addGoal(el.textContent.trim());
+    el.classList.add('used');
+  }
+
+  function removeGoal(i) {
+    const removed = goals[i];
+    goals.splice(i, 1);
+    delete timelines[removed];
+    delete money[removed];
+    document.querySelectorAll('.chip').forEach(c => {
+      if (c.textContent.trim() === removed) c.classList.remove('used');
+    });
+    renderGoalList1();
+    checkNext1();
+    save();
+  }
+
+  function renderGoalList1() {
+    const list = document.getElementById('goal-list-1');
+    if (!goals.length) { list.innerHTML = ''; return; }
+    list.innerHTML = goals.map((g, i) => `
+      <div class="goal-card">
+        <span class="goal-text">${escHtml(g)}</span>
+        <button class="icon-btn danger" onclick="removeGoal(${i})" aria-label="Remove">✕</button>
+      </div>`).join('');
+  }
+
+  function checkNext1() {
+    const btn = document.getElementById('next-1');
+    const hint = document.getElementById('hint-1');
+    btn.disabled = goals.length === 0;
+    hint.style.display = goals.length > 0 ? 'none' : 'inline';
+  }
+
+  document.getElementById('goal-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addGoal();
+  });
+
+  // RANK SCREEN
+  let dragSrc = null;
+
+  function renderRank() {
+    const list = document.getElementById('goal-list-2');
+    const note = document.getElementById('single-note');
+    const sub = document.getElementById('rank-sub');
+
+    if (goals.length === 1) {
+      note.style.display = 'block';
+      sub.style.display = 'none';
+    } else {
+      note.style.display = 'none';
+      sub.style.display = 'block';
+    }
+
+    list.innerHTML = goals.map((g, i) => `
+      <div class="goal-card" draggable="${goals.length > 1}" data-i="${i}"
+        ondragstart="onDragStart(event,${i})"
+        ondragover="onDragOver(event)"
+        ondrop="onDrop(event,${i})"
+        ondragend="onDragEnd(event)">
+        ${goals.length > 1 ? '<span class="drag-handle" aria-hidden="true">⠿</span>' : ''}
+        <span class="rank-dot">${i + 1}</span>
+        <span class="goal-text">${escHtml(g)}</span>
+        ${goals.length > 1 ? `
+          <button class="icon-btn" onclick="moveGoal(${i},-1)" ${i===0?'disabled':''} aria-label="Move up">↑</button>
+          <button class="icon-btn" onclick="moveGoal(${i},1)" ${i===goals.length-1?'disabled':''} aria-label="Move down">↓</button>
+        ` : ''}
+      </div>`).join('');
+  }
+
+  function onDragStart(e, i) {
+    dragSrc = i;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function onDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  }
+  function onDrop(e, i) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (dragSrc === null || dragSrc === i) return;
+    const moved = goals.splice(dragSrc, 1)[0];
+    goals.splice(i, 0, moved);
+    save();
+    renderRank();
+  }
+  function onDragEnd(e) {
+    dragSrc = null;
+    document.querySelectorAll('.goal-card').forEach(c => {
+      c.classList.remove('dragging', 'drag-over');
+    });
+  }
+  function moveGoal(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= goals.length) return;
+    [goals[i], goals[j]] = [goals[j], goals[i]];
+    save();
+    renderRank();
+  }
+
+  // TIMELINE SCREEN
+  const TL_OPTIONS = ['1 year', '5 years', '10 years', 'Ongoing'];
+
+  function renderTimelines() {
+    const list = document.getElementById('timeline-list');
+    list.innerHTML = goals.map((g, i) => `
+      <div class="config-card">
+        <div class="config-label">
+          <span class="rank-dot">${i + 1}</span>
+          <span class="name">${escHtml(g)}</span>
+        </div>
+        <div class="pill-row">
+          ${TL_OPTIONS.map(t => `<span class="pill ${timelines[g]===t?'on':''}" onclick="setTL('${escJs(g)}','${t}')">${t}</span>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function setTL(g, t) {
+    timelines[g] = t;
+    save();
+    renderTimelines();
+  }
+
+  // MONEY SCREEN
+  const MONEY_OPTIONS = ['Yes', 'Maybe', 'Not really'];
+
+  function renderMoney() {
+    const list = document.getElementById('money-list');
+    list.innerHTML = goals.map((g, i) => {
+      const md = money[g] || {};
+      const showCost = md.involves === 'Yes' || md.involves === 'Maybe';
+      return `
+      <div class="config-card">
+        <div class="config-label">
+          <span class="rank-dot">${i + 1}</span>
+          <span class="name">${escHtml(g)}</span>
+        </div>
+        <p style="font-size:13px;color:var(--ink-light);margin-bottom:8px;">Does this goal require money to happen?</p>
+        <div class="pill-row">
+          ${MONEY_OPTIONS.map(o => `<span class="pill ${md.involves===o?'on':''}" onclick="setMoney('${escJs(g)}','${o}')">${o}</span>`).join('')}
+        </div>
+        ${showCost ? `<input class="cost-field" placeholder="Rough estimate? (e.g. $250k, $1,000/mo, no idea)" value="${escHtml(md.cost||'')}" oninput="setCost('${escJs(g)}',this.value)" />` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function setMoney(g, val) {
+    if (!money[g]) money[g] = {};
+    money[g].involves = val;
+    save();
+    renderMoney();
+  }
+
+  function setCost(g, val) {
+    if (!money[g]) money[g] = {};
+    money[g].cost = val;
+    save();
+  }
+
+  // BUILD PROMPT
+  function buildPrompt() {
+    const extra = (document.getElementById('context-extra').value || '').trim();
+    const ranked = goals.length > 1;
+
+    const goalLines = goals.map((g, i) => {
+      const tl = timelines[g] ? ` (timeline: ${timelines[g]})` : '';
+      const md = money[g] || {};
+      let mon = '';
+      if (md.involves === 'Yes') mon = `, involves money${md.cost ? ` (~${md.cost})` : ''}`;
+      if (md.involves === 'Maybe') mon = `, may involve money${md.cost ? ` (~${md.cost})` : ''}`;
+      const prefix = ranked ? `${i + 1}. ` : '- ';
+      return `${prefix}${g}${tl}${mon}`;
+    }).join('\n');
+
+    const priorityLine = ranked
+      ? `\nThese goals are ranked by priority — #1 matters most to me right now.`
+      : `\nThis is my primary focus right now — please go deep on it.`;
+
+    const contextLine = extra ? `\n\nA bit about me: ${extra}` : '';
+
+    return `I want you to act as my personal life and financial strategist. I've done some reflection and here are my goals:\n\n${goalLines}\n${priorityLine}${contextLine}\n\nPlease do the following:\n\n1. For each goal, create a clear 1-year, 5-year, and 10-year milestone — even if the goal has a shorter timeline, show me what "done" looks like and what comes next.\n\n2. For each milestone, give me 3–5 concrete action steps I can take right now to start moving toward it.\n\n3. If a goal involves money, include: what it will likely cost, how I might fund or save for it, and any financial habits or structures I should put in place.\n\n4. Look across all my goals and tell me: where do they support each other? Where might they conflict? What's the smartest order to tackle them?\n\n5. End with a "start this week" section — the 3 most important things I can do in the next 7 days to build momentum across all my goals.\n\nBe specific, honest, and encouraging. Don't give me generic advice — I want this tailored to my actual goals and situation. If you need to make assumptions to be specific, state them clearly and I'll correct you.`;
+  }
+
+  function buildAndShow() {
+    const prompt = buildPrompt();
+    document.getElementById('prompt-output').textContent = prompt;
+    goScreen(5);
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById('prompt-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const el = document.getElementById('copy-success');
+      el.style.display = 'inline-flex';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const el = document.getElementById('copy-success');
+      el.style.display = 'inline-flex';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    });
+  }
+
+  function downloadPrompt() {
+    const text = document.getElementById('prompt-output').textContent;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'money-on-purpose-goals-prompt.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function startOver() {
+    if (!confirm('Start over? Your current goals will be cleared.')) return;
+    goals = []; timelines = {}; money = {};
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('used'));
+    renderGoalList1();
+    checkNext1();
+    goScreen(0);
+  }
+
+  // UTILS
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escJs(s) {
+    return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  }
+
+  // INIT
+  load();
+  updateProgress(0);
+</script>
+</body>
+</html>
